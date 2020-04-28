@@ -39,21 +39,20 @@ const CartProvider: React.FC = ({ children }) => {
     loadProducts();
   }, []);
 
-  const saveStorage = useCallback(async productsToSave => {
-    await AsyncStorage.setItem(
+  const saveStorage = useCallback(productsToSave => {
+    return AsyncStorage.setItem(
       '@GoMarketplace:cart',
       JSON.stringify(productsToSave),
     );
   }, []);
 
   const changeQuantity = useCallback(
-    async (index: number, quantity: number) => {
-      const newProducts = products;
+    (index: number, quantity: number) => {
+      const newProducts = [...products];
       newProducts[index].quantity += quantity;
       setProducts([...newProducts]);
-      return saveStorage([...newProducts]);
     },
-    [products, saveStorage],
+    [products],
   );
 
   const addToCart = useCallback(
@@ -62,14 +61,15 @@ const CartProvider: React.FC = ({ children }) => {
         prod => prod.id === product.id,
       );
       if (findedProductIndex !== -1) {
-        await changeQuantity(findedProductIndex, 1);
+        changeQuantity(findedProductIndex, 1);
       } else {
         const newProduct = { ...product, quantity: 1 };
         setProducts([...products, newProduct]);
-        await saveStorage([...products, newProduct]);
       }
+
+      await saveStorage([...products]);
     },
-    [products, changeQuantity, saveStorage],
+    [changeQuantity, products, saveStorage],
   );
 
   const increment = useCallback(
@@ -77,22 +77,26 @@ const CartProvider: React.FC = ({ children }) => {
       const productIndex = products.findIndex(product => product.id === id);
       if (productIndex === -1) return;
 
-      await changeQuantity(productIndex, 1);
+      changeQuantity(productIndex, 1);
+
+      await saveStorage([...products]);
     },
-    [products, changeQuantity],
+    [products, changeQuantity, saveStorage],
   );
 
   const decrement = useCallback(
     async id => {
       const productIndex = products.findIndex(product => product.id === id);
-      if (productIndex === -1) return;
-      if (products[productIndex].quantity === 1) {
-        const newProducts = products;
-        newProducts.splice(productIndex, 1);
-        setProducts([...newProducts]);
-        await saveStorage([...newProducts]);
-      } else {
-        await changeQuantity(productIndex, -1);
+      if (productIndex !== -1) {
+        if (products[productIndex].quantity === 1) {
+          const newProducts = [...products];
+          newProducts.splice(productIndex, 1);
+          setProducts([...newProducts]);
+        } else {
+          changeQuantity(productIndex, -1);
+        }
+
+        await saveStorage([...products]);
       }
     },
     [products, changeQuantity, saveStorage],
