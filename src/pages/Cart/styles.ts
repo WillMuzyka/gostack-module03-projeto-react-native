@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { FlatList, FlatListProps } from 'react-native';
+import { FlatList } from 'react-native';
 
 interface Product {
   id: string;

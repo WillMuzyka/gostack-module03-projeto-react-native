@@ -39,7 +39,7 @@ const Cart: React.FC = () => {
   const { increment, decrement, products: cartProducts } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
 
-  useEffect(() => setProducts(cartProducts), []);
+  useEffect(() => setProducts(cartProducts), [cartProducts]);
 
   function handleIncrement(id: string): void {
     increment(id);
