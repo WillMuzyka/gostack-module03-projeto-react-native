@@ -39,12 +39,16 @@ const CartProvider: React.FC = ({ children }) => {
     loadProducts();
   }, []);
 
-  const saveStorage = useCallback(async productsToSave => {
-    await AsyncStorage.setItem(
-      '@GoMarketplace:cart',
-      JSON.stringify(productsToSave),
-    );
-  }, []);
+  useEffect(() => {
+    async function saveProducts(): Promise<void> {
+      await AsyncStorage.setItem(
+        '@GoMarketplace:cart',
+        JSON.stringify(products),
+      );
+    }
+
+    saveProducts();
+  }, [products]);
 
   const addToCart = useCallback(
     async product => {
@@ -60,9 +64,8 @@ const CartProvider: React.FC = ({ children }) => {
       }
 
       setProducts([...cartProducts]);
-      await saveStorage(cartProducts);
     },
-    [products, saveStorage],
+    [products],
   );
 
   const increment = useCallback(
@@ -72,10 +75,9 @@ const CartProvider: React.FC = ({ children }) => {
       if (productIndex !== -1) {
         cartProducts[productIndex].quantity += 1;
         setProducts([...cartProducts]);
-        await saveStorage(cartProducts);
       }
     },
-    [products, saveStorage],
+    [products],
   );
 
   const decrement = useCallback(
@@ -90,10 +92,9 @@ const CartProvider: React.FC = ({ children }) => {
         }
 
         setProducts([...cartProducts]);
-        await saveStorage(cartProducts);
       }
     },
-    [products, saveStorage],
+    [products],
   );
 
   const value = React.useMemo(
