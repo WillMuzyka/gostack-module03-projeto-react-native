@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
 import { View } from 'react-native';
@@ -41,15 +41,21 @@ const Cart: React.FC = () => {
 
   useEffect(() => setProducts(cartProducts), [cartProducts]);
 
-  function handleIncrement(id: string): void {
-    increment(id);
-  }
+  const handleIncrement = useCallback(
+    (id: string): void => {
+      increment(id);
+    },
+    [increment],
+  );
 
-  function handleDecrement(id: string): void {
-    const newProducts = products.filter(product => product.id !== id);
-    setProducts(newProducts);
-    decrement(id);
-  }
+  const handleDecrement = useCallback(
+    (id: string): void => {
+      const newProducts = products.filter(product => product.id !== id);
+      setProducts(newProducts);
+      decrement(id);
+    },
+    [decrement, products],
+  );
 
   const cartTotal = useMemo(() => {
     const total = products.reduce(

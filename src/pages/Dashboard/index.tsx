@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
 import { View } from 'react-native';
@@ -43,9 +43,12 @@ const Dashboard: React.FC = () => {
     loadProducts();
   }, []);
 
-  function handleAddToCart(item: ProductInDashboard): void {
-    addToCart(item);
-  }
+  const handleAddToCart = useCallback(
+    async (item: ProductInDashboard): Promise<void> => {
+      await addToCart(item);
+    },
+    [addToCart],
+  );
 
   return (
     <Container>
